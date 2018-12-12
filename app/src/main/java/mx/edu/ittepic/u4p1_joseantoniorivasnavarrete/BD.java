@@ -14,7 +14,7 @@ public class BD extends SQLiteOpenHelper {
         //Se ejecuta cuando la aplicación (ejercicio 1) se ejecuta en el CEL
         //Sirve para construir en el SQLite que está en el CEL las tablas
         //que la APP requere para funcionar.
-        db.execSQL("CREATE TABLE RECETA(ID INTEGER PRIMARY KEY, NOMBRE VARCHAR(200), INGREDIENTES VARCHAR(1000),PREPARACION VARCHAR(1000),OBSERVACIONES VARCHAR(500))");
+        db.execSQL("CREATE TABLE RECETA(ID INTEGER PRIMARY KEY, NOMBRE VARCHAR(200), INGREDIENTES VARCHAR(1000),PREPARACION VARCHAR(1000),OBSERVACIONES VARCHAR(5<<<<<<<<<<<<<<<<<<<<<<<<<<<<<00))");
         //No funciona para select
         //db.rawQuery(  )
     }

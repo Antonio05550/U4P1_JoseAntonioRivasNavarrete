@@ -36,48 +36,108 @@ public class MainActivity extends AppCompatActivity {
         agregar.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               insertar();
+                insertar();
             }
         } );
-
+        consultar.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                consultar();
+            }
+        } );
+        actualizar.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actualizar();
+            }
+        } );
+        eliminar.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eliminar();
+            }
+        } );
     }
-
     private void insertar(){
         try{
-            SQLiteDatabase tabla = base.getWritableDatabase();
+            SQLiteDatabase bd = base.getWritableDatabase();
             String SQL = "INSERT INTO RECETA VALUES("+id.getText().toString()+ ",'"+nombre.getText().toString()
                     +"','"+ingredientes.getText().toString()+"','"+preparacion.getText().toString()
                     +"','"+observacion.getText().toString()+"')";
-            tabla.execSQL(SQL);
+            bd.execSQL(SQL);
             Toast.makeText(this, "Listo", Toast.LENGTH_LONG).show();
-            tabla.close();
-        }catch (Exception e){
-            Toast.makeText( this,"Error: No se pudo",Toast.LENGTH_LONG);
+            bd.close();
+        }catch (SQLiteException e){
+            Toast.makeText(this,"No se pudo",Toast.LENGTH_LONG).show();
         }
     }
-    private void consultar(){
-        final EditText id = new EditText( this );
-        id.setInputType( InputType.TYPE_CLASS_NUMBER );
-        id.setHint( "Valor mayor a 0" );
-        String msj = "Ingrese el ID";
+    public void consultar(){
+        final String valor;
+        final EditText no = new EditText( this );
+        no.setInputType( InputType.TYPE_CLASS_NUMBER );
+        no.setHint( "Mayor a cero" );
 
         AlertDialog.Builder alerta = new AlertDialog.Builder( this );
-        alerta.setTitle( "Consultar" ).setMessage( msj )
-                .setView( id )
+        alerta.setTitle( "Consultar" ).setMessage( "Ingrese el ID" )
+                .setView( no )
                 .setPositiveButton( "Buscar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this,"Listo: " + id,Toast.LENGTH_LONG).show();
+                        try{
+                            SQLiteDatabase bd = base.getReadableDatabase();
+                            String SQL = "SELECT *FROM RECETA WHERE Id="+no.getText().toString();
+                            Cursor resultado = bd.rawQuery(SQL,null);
+                            if (resultado.moveToFirst())
+                            {
+                                id.setText(resultado.getString(0));
+                                nombre.setText(resultado.getString(1));
+                                ingredientes.setText(resultado.getString(2));
+                                preparacion.setText(resultado.getString(3));
+                                observacion.setText(resultado.getString(4));
+                            }
+                            else {
+                                msj( "No existe un propietario con dicho ID" );
+                            }
+                            bd.close();
+                        }catch (SQLiteException e){
+                            msj( "Ingrese un valor" );
+                        }
                         return;
                     }
                 } )
                 .setNegativeButton( "Cancelar",null ).show();
+    }
+    public  void actualizar(){
+        try{
+            SQLiteDatabase bd = base.getWritableDatabase();
+            String SQL = "UPDATE RECETA SET NOMBRE='"+nombre.getText().toString()
+                    +"',INGREDIENTES='"+ingredientes.getText().toString()+"',PREPARACION='"+preparacion.getText().toString()
+                    +"',OBSERVACIONES='"+observacion.getText().toString() +"' WHERE Id="+id.getText().toString();
+            bd.execSQL(SQL);
+            Toast.makeText(this, "Listo", Toast.LENGTH_LONG).show();
+            bd.close();
+        }catch (SQLiteException e){
+            Toast.makeText(this,"No se encontro el registro",Toast.LENGTH_LONG).show();
+        }
+    }
+    public void eliminar(){
+        try{
+            SQLiteDatabase bd = base.getWritableDatabase();
+            String SQL = "DELETE FROM RECETA WHERE Id="+id.getText().toString();
+            bd.execSQL(SQL);
+            Toast.makeText(this, "Listo", Toast.LENGTH_LONG).show();
+            bd.close();
+            id.setText("");
+            nombre.setText("");
+            ingredientes.setText("");
+            preparacion.setText("");
+            observacion.setText("");
+        }catch (SQLiteException e){
+            Toast.makeText(this,"No se encontro el registro",Toast.LENGTH_LONG).show();
+        }
 
     }
-    private void modificar(){
-
-    }
-    private void eliminar(){
-
+    public void msj(String m){
+        Toast.makeText(this, m, Toast.LENGTH_LONG).show();
     }
 }
